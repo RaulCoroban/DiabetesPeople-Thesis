@@ -1,0 +1,26 @@
+Applying Feature Selection techniques to medical data such as clinical, genomic, proteomic or metabolomic information could solve two important medical problems. One is related to the task of finding which are the relevant variables involved in a disease, response to treatment, survival time, relapse probability, etc. It could lead to understand better the disease mechanisms, evaluate the factors that are involved or even propose new hypotheses about factors that have not been taken into account until this moment. The second one is to perform variable reduction and learn a predictive model with the best possible performance to cost ratio by using the minimum set of diagnostic variables. This estimator could then be used as an aid in clinical decisions or as an indicator for research. In this case, the focus can be moved from the relevancy of the reduced variable subset to the final performance of the model. 
+\\
+
+Despite the considerable efforts made in capturing health data, the common situation is still having much more variables than observations (individuals). While the number of observations is usually around hundreds or thousands, the number of variables could reach millions. This is an unfavourable condition for any Machine Learning algorithm (Bellman's curse of dimensionality \cite{Bellman2015AdaptiveTour}). Ensemble feature selection received increasing attention during the last decade \cite{Bolon-Canedo2019EnsemblesTrends} \cite{Pes2020EnsembleDomains} and consists in combining the output of several inducers applied on distinct subset of a database. It results in an improvement of the selection stability and robustness to the lack of observations. Nevertheless, more work is required especially with relevant but redundant variables which tend not to be selected. 
+\\
+
+This work's motivation is to strengthen the collaboration between Artificial Intelligence and Medical teams. Any advances in our knowledge of ensemble feature selection is a step more in bringing AI to being useful in tasks including medical and health applications. 
+\\
+
+There are no direct biological insights to be found, neither biomarkers to be discovered, but an algorithm proposing a list of variables that could be involved in a prediction. Also, we study the behaviour of ensemble feature selection with redundant variables, interaction of which is commonly unknown and intricate to decipher.
+\\
+
+\subsection{Ensemble}
+The inner construction of the Ensemble we used to perform this work is described in Figure X.
+
+A regular run of the algorithm has the following steps:
+\begin{enumerate}
+    \item Resample the data using a \emph{resampling without replacement} technique.
+    \item Apply several feature selectors to each split, then evaluate their performance iteratively to achieve the best predictive variable subset. Each run delivers a \emph{sequential}.
+    \item Discard sequentials which do not achieve an overall score above a set threshold.
+    \item Aggregate sequentials results: Each feature appeareance in a sequential result adds a vote to the feature.
+    \item Return the full list of features, discarding those not voted.
+\end{enumerate}
+
+After previous attempts from using Spearman or Pearson correlation to identify linkage among features over a threshold, this project performs an iterative swap between each of the items in a feature set (already calculated in an individual sequential) and the missing features picked by the full ensemble (as a result of a consensus function) in order to perform a retraining of the sequentials and further compare the prediction results 
+The theory behind the swapping assumes that if a pair of predictions, the original one and the set-swapped, are similar more than a threshold (usually above 95\%) the pair of features swapped are highly linked.
