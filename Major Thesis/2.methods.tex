@@ -1,10 +1,122 @@
-This project aims to study the limits of ensemble feature selection varying the amount of variables, observations, inducers and any other hyper-parameter of the algorithm. Also we will study the behaviour of ensemble feature selection with redundant variables.
+\subsection{Pipelining \emph{ensemble} results}
+\label{section:methods:pipeline}
+A run on the \emph{ensemble} tool results in an object containing all the information from each sequential run, its inner splits and features used for prediction.
 
-Research question(s):
-What are the limits of ensemble feature selection in identifying relevant variables?
-- Data types. They are sensitive to the swapper and any redundancy method, although it can be tackled if we use MRMR.
-What is the influence of redundant variables on feature selection?
-- They divide the vote and lower the rank of the real features.
+We reproduce the same conditions to obtain the Reference Observation (RO):
+
+The new module loads an ensemble object, get its top variables (topN) and iterates over the contained sequentials. Each sequential has S data splits, which we must itearte over. For each set of selected variables from RO in a sequential, a model is re-trained and tested in order to obtain a swap result (SO). After, each variable from sequential top is swapped by another coming from ensemble topN (if it’s not in the set yet) to run a new model training (using the same data split) and aim for performance contrast.
 \\
 
-The project will be developed mainly in Python language, using a Machine learning core library based on scikit-learn. Also we dispose of controlled synthetic data and real databases containing type 2 diabetes and breast cancer.
+\emph{Pseudocode}
+Loop for each S in sequential:
+\begin{itemize}
+    \item Loop for each (Train, Test) in S:
+    \begin{itemize}
+        \item Train model on Train using Original Vars
+        \item Evaluate on Test: generate Reference Observation (RO)
+        \item Loop for each U in Original Vars:
+        \begin{itemize}
+            \item Loop for each V in topN not in Original Vars:
+            \begin{itemize}
+                \item Swap U for V
+                \item Re-train model on Train split.
+                \item Re-evaluate on Test split: generate Swap Observation (S))
+                \item Compare RO and SO scores and predictions.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+
+
+Swapping example:\\
+topN = [A, B, D, E]\\
+Original Vars (OVars) = [B, C, D, F, G]\\
+swap($\forall$ V $\in$ topN $\and \not \in$ OVars)\\
+\\
+—–\\
+set iterationA1 = [A, C, D, F, G]\\
+set iterationA2 = [B, A, D, F, G]\\
+...\\
+set iterationA5 = [B, C, D, F, A]\\
+set iterationE1 = [E, C, D, F, G]\\
+...\\
+set iterationE5 = [B, C, D, F, E]\\
+
+\subsubsection{Metrics}
+Depending on the kind of target we expect, we must adapt the metric used to compare the predicted targets. As we deal with a classification problem, we compare predicted labels using the accuracy score and assign a \textit{weak relavance} score from 0 to 1 to each pair of variables.
+
+\subsubsection{Time Complexity}
+The method contains 4 inner loops, spread across 4 protected methods.
+\\
+
+\textbf{Best case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v == t) then:
+\begin{center}
+Min. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T - U\\    
+\end{center}
+
+\textbf{Worst case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v != t) then:
+\begin{center}
+Max. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T\\    
+\end{center}
+
+
+Where: \textit{Sequentials amount} = S, \textit{Splits per sequential} = P, \textit{Variable set per split} = V and \textit{number of ensemble’s top variables} = T
+
+
+\subsubsection{Interpretation of outcomes}
+After a full run where all the possible swaps have been made, a list of pairs of variables and their scores is returned. Only results scoring above 0.75/1 accuracy and 0.95/1 weak relevance are saved by default. The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
+
+\begin{table}[]
+\centering
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{cr|c|c|c|c|c|c|}
+\cline{3-8}
+                                                       & \multicolumn{1}{c|}{} & \multicolumn{6}{c|}{Added}                                                      \\ \cline{3-8} 
+\multicolumn{1}{l}{}                                   &                       & \textbf{F01} & \textbf{F02} & \textbf{F03} & \textbf{F04} & \textbf{F05} & \textbf{F06} \\ \hline
+\multicolumn{1}{|c|}{\multirow{6}{*}{\rotatebox{90}{Removed}}} & \textbf{F01}          & -            & 2            & 4            & 3            & 2            & 0            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F02}          & 2            & -            & 3            & 0            & 2            & 4            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F03}          & 3            & 4            & -            & 1            & 2            & 3            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F04}          & 4            & 0            & 2            & -            & 0            & 5            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F05}          & 5            & 1            & 5            & 1            & -            & 2            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F06}          & 0            & 3            & 3            & 4            & 2            & -            \\ \hline
+\end{tabular}%
+}
+\label{tbl:swapvars}
+\caption{Weak relevance relation matrix. Row indexes include the removed variable from the original set and column names contain the variables they have been swapped for. The relation value summarises the number of times a swap has resulted in a score > 0.75 and the weak relevance score > 0.95.}
+\end{table}
+
+\subsection{Grouping variables}
+
+The relation plots such as Chords are built on relation tables (Table \ref{tbl:swapvars}) among variables. Since the main aim of the procedure is to cluster variables based on their redundancy, all connected components must belong to the same group.
+Graph representations improve displaying connected components which go through further analysis. With a reduced number of variables as the toy example, the grouping does not need coherence checking.
+
+Figure ?? shows the comparison and clustering. When the graph becomes too tangled for static plots, interactive versions are available.
+In order to cluster the connected components we can follow two strategies:
+
+\begin{enumerate}
+    \item Connected component grouping: Cluster all the nodes that hold at least a connection.
+    \begin{itemize}
+        \item Requires a T threshold for the \emph{weak relevance} score limit.
+        \item Filter by \emph{weak relevance} score (number of links per total number of swaps)
+        \item Optionally filter by score gain.
+    \end{itemize}
+    
+    \item Link strength grouping: Creates M groups, based on threshold ranges.
+\end{enumerate}
+
+
+\subsubsection{Approaches}
+We have developed different mechanisms of establishing relations among variables. They all group variables and set a \textit{representative} of the group. The elect item will replace all occurrences of any contained item.
+
+\textbf{Weak relevance}\\
+Each connected component from the previous steps picks a representative by maximum connectivity. If there is only one connected component, this will be checked for inner community structures using the \_ algorithm, which will split the graph into >1 connected components.
+
+\textbf{Spearman Correlation}
+
+We dispose of the labels
+\textbf{1k loci distance}\\
+
+\textbf{10k loci distance}\\
+
+\textbf{Gene translation}

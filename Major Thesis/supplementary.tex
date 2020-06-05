@@ -1,0 +1,6 @@
+\subsection{Python implementation}
+The code is contained in Python classes. The main swapping function is callable as a method class, although the inner loops are split in protected methods, since they are made to work internally. There’s a protected method for each level of depth in the loops of the algorithm described in \ref{section:methods:pipeline}.The information is shared among them via custom objects or the global class attributes.
+\\
+
+Aside the main objects, there is a Metadata object which stores all the information for future preprocessing of the data and allows recovery on the same spot the execution ended, either due to an intended halt or an error.
+Data for preprocessing is highly important since we require results normalization. This is explained further in the Analysis.
