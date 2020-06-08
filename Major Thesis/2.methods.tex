@@ -1,3 +1,6 @@
+\subsection{Data set}
+The original data contains 488 patient samples across 78980 SNPs. Data has been obtained through agreements with \emph{Hospital Universitari i Politècnic La Fe} from Valencia. It's represented as a matrix of codes [0, 1, 2], being 0 = homozygous non-reference, 1 = heterozygous, 2 = homozygous reference.
+
 \subsection{Pipelining \emph{ensemble} results}
 \label{section:methods:pipeline}
 A run on the \emph{ensemble} tool results in an object containing all the information from each sequential run, its inner splits and features used for prediction.
@@ -30,21 +33,63 @@ Loop for each S in sequential:
 
 
 Swapping example:\\
+\begin{center}
 topN = [A, B, D, E]\\
 Original Vars (OVars) = [B, C, D, F, G]\\
-swap($\forall$ V $\in$ topN $\and \not \in$ OVars)\\
-\\
-—–\\
-set iterationA1 = [A, C, D, F, G]\\
-set iterationA2 = [B, A, D, F, G]\\
-...\\
-set iterationA5 = [B, C, D, F, A]\\
-set iterationE1 = [E, C, D, F, G]\\
-...\\
-set iterationE5 = [B, C, D, F, E]\\
+swap($\forall$ V $\in$ topN $\and \not \in$ OVars)\\    
+\end{center}
+
+\begin{table}[!htbp]
+\centering
+\resizebox{0.45\textwidth}{!}{%
+\begin{tabular}{l|c|c|c|c|c|}
+\cline{2-6}
+                                                        & \multicolumn{5}{c|}{Feature set}                                                                                                                                                         \\ \hline
+\multicolumn{1}{|l|}{Original}                          & B                                  & C                                  & D                                  & G                                  & F                                  \\ \hline
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{FFCC67}\textbf{A} & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & \cellcolor[HTML]{FFCC67}\textbf{A} & D                                  & G                                  & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{FFCC67}\textbf{A} & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & C                                  & D                                  & \cellcolor[HTML]{FFCB2F}\textbf{A} & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{\multirow{-5}{*}{Swap Iterations}} & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{FFCC67}\textbf{A} \\ \hline
+\end{tabular}%
+}
+\quad
+\resizebox{0.45\textwidth}{!}{%
+\begin{tabular}{l|c|c|c|c|c|}
+\cline{2-6}
+                                                        & \multicolumn{5}{c|}{Feature set}                                                                                                                                                         \\ \hline
+\multicolumn{1}{|l|}{Original}                          & B                                  & C                                  & D                                  & G                                  & F                                  \\ \hline
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{68CBD0}\textbf{E} & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & \cellcolor[HTML]{68CBD0}\textbf{E} & D                                  & G                                  & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{68CBD0}\textbf{E} & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & C                                  & D                                  & \cellcolor[HTML]{68CBD0}\textbf{E} & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{\multirow{-5}{*}{Swap Iterations}} & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{68CBD0}\textbf{E} \\ \hline
+\end{tabular}%
+}
+\label{tbl:swap-example}
+\caption{Generated sets for re-training using [A, B, D, E] as topN and [B, C, D, F, G] as OVars. Rows under "Swap Iterations" are the new features used for retraining, while "Original" will deliver the reference original prediction.}
+\end{table}
 
 \subsubsection{Metrics}
 Depending on the kind of target we expect, we must adapt the metric used to compare the predicted targets. As we deal with a classification problem, we compare predicted labels using the accuracy score and assign a \textit{weak relavance} score from 0 to 1 to each pair of variables.
+
+\subsection{Results extraction}
+After a full run where all the possible swaps have been made, a list of pairs of variables and their scores is returned. Only results scoring above 0.75/1 accuracy and 0.95/1 weak relevance are saved by default. The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
+\\
+
+Each time a swap result has passed the threshold, we increment the strenght of the link among the implied variables by 1. As a result, we obtain a graph network whose edges represent the weight of the weak relevance score.
+
+\subsubsection{Correction}
+The \emph{ensemble} method delivers the most voted features as the result set (RS). The items $\in$ RS are swapped for each element of the original set (OS), therefore, due to the nature of the problem, there is a higher chance for an item $\in$ RS to be rejected, as its number os votes is higher, i.e. the more votes it gets, the more present will be in OS, and therefore, the swap will not be performed. The procedure actively avoids having duplicated features in the train/test to prevent multicollinearity problems. Due to this, as a post-processing step, we correct the number of times a swap has been successfully performed by adding a weighted score instead of 1:
+
+\begin{center}
+    Weak Relavance Score = \#successful swaps / \#all attempts to swap overall
+\end{center}
+
+Using the example detailed in \ref{tbl:swap-example}, variables A and E are the only ones allowed to be swapped. B and D cannot be used for this particular Original Vars set. For this iteration, the number of attempts to swap is 0 for B and D, however, in another set they might have a chance.
+\\
+
+On the other hand, each sequential has N splits of data. Since the split loop contains the swap ones, the same swap can be performed N times, yielding different results each time. We’ve decided to cluster the results per swap applying a mean over all the split results.
 
 \subsubsection{Time Complexity}
 The method contains 4 inner loops, spread across 4 protected methods.
@@ -62,10 +107,6 @@ Max. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T\\
 
 
 Where: \textit{Sequentials amount} = S, \textit{Splits per sequential} = P, \textit{Variable set per split} = V and \textit{number of ensemble’s top variables} = T
-
-
-\subsubsection{Interpretation of outcomes}
-After a full run where all the possible swaps have been made, a list of pairs of variables and their scores is returned. Only results scoring above 0.75/1 accuracy and 0.95/1 weak relevance are saved by default. The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
 
 \begin{table}[]
 \centering
@@ -107,16 +148,35 @@ In order to cluster the connected components we can follow two strategies:
 
 
 \subsubsection{Approaches}
+\label{methods:grouping:approaches}
 We have developed different mechanisms of establishing relations among variables. They all group variables and set a \textit{representative} of the group. The elect item will replace all occurrences of any contained item.
+\\
 
 \textbf{Weak relevance}\\
 Each connected component from the previous steps picks a representative by maximum connectivity. If there is only one connected component, this will be checked for inner community structures using the \_ algorithm, which will split the graph into >1 connected components.
 
-\textbf{Spearman Correlation}
+As we deal with SNP information, we check the information among two SNPs, i.e. overlap their vectors and extract a Jaccard Similarity Score (JSC). Most of the data include either a majority of 0's or a majority of 1's, therefore, Jaccard scores near 0 and 1 are expected. We set the Jaccard information to filter scores below 0.2 and above 0.8 to correct the graph construction prior to grouping and aim for the highly similar features.
+\\
 
-We dispose of the labels
+\textbf{Spearman Correlation}\\
+All features have been compared to each other to assess their Spearman correlation score. Each pair obtaining an absolute score above 0.95 are \emph{linked} together under the same group. The representative is picked randomly.
+
+For the following grouping approaches, we use the labels of each SNP, which follow the format: (chromosome-locus-.-referenceAllele-observedAllele).
+\\
+
 \textbf{1k loci distance}\\
+We group SNPs which are at a maximum of 1000 bases distance using Python scripts which split labels and merge Data Frame labels (column names).
+\\
 
 \textbf{10k loci distance}\\
+We group SNPs which are at a maximum of 10.000 bases distance using Python scripts which split labels and merge Data Frame labels (column names).
+\\
 
 \textbf{Gene translation}
+Each label has been trimmed to extract chromosome number and locus. This information is used to query the RS identifier of an SNP, and retrieve its Gene Symbol and consequence. SNPs belonging to the same gene are grouped. If the SNPs is targeted as a non-synonymous mutation we assume the product will be altered, hence the grouping is more accurate.
+
+\subsection{Application to original results}
+We use an already calculated \emph{ensemble} to perform the swaps. Within this model, we find information about the features picked individially by \emph{sequential}. Counting the votes of each sequential delivers the final vote score per feature.
+\\
+
+Each of the approaches in subsection \ref{methods:grouping:approaches} establish a relation among features that might be competeing for the votes. Grouping allows us to aggregate their votes and overcome vote split.
