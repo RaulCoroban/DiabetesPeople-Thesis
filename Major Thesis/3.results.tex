@@ -18,7 +18,7 @@ After swapping, the results show:
 	\hfill
 	\begin{subfigure}[b]{0.3\linewidth}
 		\includegraphics[width=\linewidth]{figures/heatmaps/heatmap_swap_ensemble1000_RCN5333300_097.png}
-		\caption{Heatmap from matrix at \emph{t} = 0.98. Edge thickness indeicates relation strength.}
+		\caption{Heatmap from matrix at \emph{t} = 0.98. Edge thickness indicates relation strength.}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.3\linewidth}
@@ -26,7 +26,7 @@ After swapping, the results show:
 		\caption{Graph clustering at \emph{t} = 0.98}
 	\end{subfigure}
 	\label{fig:triade}
-	\caption{Clustering process. (a) Shows relation in Chord diagram to ease visualisation. (b) Gives the matrix which we post-process to keep only relevant links. (c) Final relation graph. Each connected component is a final group whose representative is the most connected node. Community detection algoritms color each group.}
+	\caption{Clustering process. (a) Shows relation in Chord diagram to ease visualisation. (b) Gives the matrix which we post-process to keep only relevant links. (c) Final relation graph. Each connected component is a final group whose representative is the most connected node. Community detection algorithms colour each group.}
 \end{figure}
 
 On the other hand, we also found a drawback: Some redundant features relate to other than theirs. E.g R00 relates to F01, F02. However, the relation is stronger to R00, which can only by filtered by a threshold modification, allowing only relations above 0.97 get past it. Evolution of the relations using a moving threshold can be found in Suppl. Material \ref{suppl:relations}
@@ -74,3 +74,5 @@ Testing the similarity score among features by randomly picking them shows a bim
 	\caption{Relations among variables after full swapping top \emph{ensemble} variables with all feature set. Results filtered at WRS\footnote{WRS = Weak Relevance Score}=1, JSC\footnote{Jaccard Similarity Score}<0.2 and 0.8>JSC.}
     \label{fig:dt2-trimmed}
 \end{figure}
+
+\subsubsection{Time complexity}
