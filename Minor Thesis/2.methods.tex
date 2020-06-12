@@ -1,0 +1,183 @@
+\subsection{Data set}
+The original data contains 486 patient samples across 15,582 SNPs. 120 patient exoms come from \emph{Egabro} and \emph{Pizarra} populational cohorts, from patients above 40 years old. These samples were picked from individuals showing insuline-resitance at the study's starting point and Type 2 Diabetes (T2D) at its closure. Remaining 366 exoms come from CIBERDEM\footnote{CIBERDEM: \emph{Centro de Investigación Biomédica en Red de Diabetes y Enfermedades Metabólicas Asociadas} - \url{https://www.ciberdem.org}} Biobank and DNA National Biobank\footnote{\emph{Banco Nacional de ADN}: \url{http://www.bancoadn.org}}. Samples were collected from individuals among 40 and 65 years old and a Body Mass Index (BMI) between 25 y 34.9 Kg/$m^{2}$
+\\
+
+WHO criteria were followed for classifying cases and samples (out of the scope of this project) and delivered 220 cases and 266 controls. The main dataset represents SNPs as a matrix of codes [0, 1, 2], being 0 = homozygous non-reference, 1 = heterozygous, 2 = homozygous reference. 
+\\
+
+Real variants labels have been encrypted due to confidentiality reasons.
+
+\subsection{Pipelining \emph{ensemble} results}
+\label{section:methods:pipeline}
+A run on the \emph{ensemble} tool results in an object containing all the information from each sequential run, its inner splits and features used for prediction.
+\\
+
+The module developed in this work loads an ensemble object, and gets its top-ranked variables (top289) which obtain more than 8 votes. The 8 votes threshold has been obtained through different procedures out of the scope of this work. We obtained 289 variants.
+\\
+
+Then it iterates over the contained original sequentials (zone (d) in Figure \ref{fig:ensemble-diagram}) and for each set of its original variables sequential the model is re-trained. Each sequential contains the necessary information to run the training under the same conditions as originally, hence we obtain a reference target. Last, each variable from top289 in the sequential is swapped by each variable in the original set to run a new model training under the same conditions, except the feature set.
+We can draw a new accuracy score on the new feature set, and also relations among the pairs of variables swapped.
+\\
+
+\emph{Pseudocode}\\
+
+Select \textcolor{blue}{topN}\\
+
+Loop for each S in sequential:
+\begin{itemize}
+    \item Loop for each (Train, Test) in S:
+    \begin{itemize}
+        \item Train model on Train using \textcolor{red}{Original Vars}
+        \item Evaluate on Test: generate Reference Observation \textcolor{orange}{(RO)}
+        \item Loop for each \textcolor{red}{U} $\in$ Original Vars:
+        \begin{itemize}
+            \item Loop for each \textcolor{blue}{V} $\in$ topN \and $\not \in$ Original Vars:
+            \begin{itemize}
+                \item Swap \textcolor{red}{U} for \textcolor{blue}{V}
+                \item Re-train model on Train split.
+                \item Re-evaluate on Test split: generate Swap Observation \textcolor{green}{(SO)}
+                \item Compare \textcolor{orange}{RO} and \textcolor{green}{SO} scores and predicted targets.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+
+
+%Swapping example:\\
+%\begin{center}
+%topN = [A, B, D, E]\\
+%Original Vars (OVars) = [B, C, D, F, G]\\
+%swap($\forall$ V $\in$ topN $\and \not \in$ %OVars)\\    
+%\end{center}
+
+\begin{table}[!htbp]
+\centering
+\resizebox{0.45\textwidth}{!}{%
+\begin{tabular}{l|c|c|c|c|c|}
+\cline{2-6}
+                                                        & \multicolumn{5}{c|}{Feature set}                                                                                                                                                         \\ \hline
+\multicolumn{1}{|l|}{Sequential Set}                          & B                                  & C                                  & D                                  & G                                  & F                                  \\ \hline
+\multicolumn{1}{|l|}{}                                  & \cellcolor{blue}\textbf{A} & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & \cellcolor{blue}\textbf{A} & D                                  & G                                  & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor{blue}\textbf{A} & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & C                                  & D                                  & \cellcolor{blue}\textbf{A} & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{\multirow{-5}{*}{Swap Iterations}} & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor{blue}\textbf{A} \\ \hline
+\end{tabular}%
+}
+\quad
+\resizebox{0.45\textwidth}{!}{%
+\begin{tabular}{l|c|c|c|c|c|}
+\cline{2-6}
+                                                        & \multicolumn{5}{c|}{Feature set}                                                                                                                                                         \\ \hline
+\multicolumn{1}{|l|}{Sequential Set}                          & B                                  & C                                  & D                                  & G                                  & F                                  \\ \hline
+\multicolumn{1}{|l|}{}                                  & \cellcolor{blue}\textbf{E} & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & \cellcolor{blue}\textbf{E} & D                                  & G                                  & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor{blue}\textbf{E} & \cellcolor[HTML]{F1F8F6}G          & \cellcolor[HTML]{F1F8F6}F          \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                  & B                                  & C                                  & D                                  & \cellcolor{blue}\textbf{E} & F                                  \\ \cline{2-6} 
+\multicolumn{1}{|l|}{\multirow{-5}{*}{Swap Iterations}} & \cellcolor[HTML]{F1F8F6}B          & \cellcolor[HTML]{F1F8F6}C          & \cellcolor[HTML]{F1F8F6}D          & \cellcolor[HTML]{F1F8F6}G          & \cellcolor{blue}\textbf{E} \\ \hline
+\end{tabular}%
+}
+\label{tbl:swap-example}
+\caption{Generated sets for re-training using [A, B, D, E] as topN and [B, C, D, F, G] as Original Variables. Rows under "Swap Iterations" are the new features used for retraining, while "Original" will deliver the reference original prediction. Variables A and E are the only ones allowed to be swapped. B and D cannot be used for this particular Original Variables set. For this iteration, the number of attempts to swap is 0 for B and D, however, in another set they might have a chance.}
+\end{table}
+
+\subsubsection{Target prediction similarity}
+We predict one target using the original set of variables within a sequential (\emph{reference target}), and one new target using the new set of variables after the swap (\emph{swap target}). Then, we calculate the overlap percentage of both targets, and set its score as the \emph{Rivalry Score} among the pair of swapped variables which originated the set difference. Scores near 0 indicate \emph{reference target} and \emph{swap target} predictions not look alike, whereas scores near 1 indicate a significant match.
+
+\\
+
+\subsection{Analysis}
+\begin{table}[!htpb]
+\centering
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{cr|c|c|c|c|c|c|}
+\cline{3-8}
+                                                       & \multicolumn{1}{c|}{} & \multicolumn{6}{c|}{Added}                                                      \\ \cline{3-8} 
+\multicolumn{1}{l}{}                                   &                       & \textbf{F01} & \textbf{F02} & \textbf{F03} & \textbf{F04} & \textbf{F05} & \textbf{F06} \\ \hline
+\multicolumn{1}{|c|}{\multirow{6}{*}{\rotatebox{90}{Removed}}} & \textbf{F01}          & -            & 2            & 4            & 3            & 2            & 0            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F02}          & 2            & -            & 3            & 0            & 2            & 4            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F03}          & 3            & 4            & -            & 1            & 2            & 3            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F04}          & 4            & 0            & 2            & -            & 0            & 5            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F05}          & 5            & 1            & 5            & 1            & -            & 2            \\ \cline{2-8} 
+\multicolumn{1}{|c|}{}                                 & \textbf{F06}          & 0            & 3            & 3            & 4            & 2            & -            \\ \hline
+\end{tabular}%
+}
+\label{tbl:swapvars}
+\caption{Rivalry relation matrix. Row indexes include the removed variable from the original set and column names contain the variables they have been swapped for. The relation value summarises the number of times a swap has resulted in a score > 0.75 and the rivalry score > 0.95.}
+\end{table}
+After a full run which performs all the possible swaps within all sequential using top289 variants, we obtain object results specifying (1) variables swapped, (2) new accuracy score obtained, (3) target prediction similarity and (4) other metadata such as original and new sets display.
+
+\subsubsection{Strength Score}
+To establish the relation strength among two swapped variables, we count the number of times it has reached a certain threshold. E.g. assuming toy example at threshold = 0.9 in which two variables have been swapped 5 times scoring [0.763, 0.937, 0.945, 0.373, 0.673] of Rivalry Score, their Strength Score would be 2/5.
+\\
+
+In this work, only results scoring above 0.75/1 accuracy and 0.95/1 Rivalry Score are kept (default). The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
+\\
+
+\subsubsection{Scoring mode}
+The \emph{ensemble} method delivers the most voted features as the result set (RS). The items $\in$ RS are swapped for each element of the original sequential set (OS), and actively avoids having duplicated features in the train/test to prevent multicollinearity problems. Therefore, due to the nature of the problem, there is a higher chance for an item $\in$ RS to be rejected, as its number of votes is higher, i.e. the more votes it gets out of an ensemble execution, the higher the chances of any randomly picked OS to contain it. To tackle this problem, the Strength Score does not count the number of times the threshold has been met using a whole unit, but weights it instead considering the overall chances variables have to be swapped:
+
+\begin{center}
+    Strength Score = \#successful swaps / \#all attempts to swap overall
+\end{center}
+
+As a result, we obtain a weighted adjacency matrix which we convert to edgelist format and transform to graph network whose edges represent the weight of the Rivalry Score (Figure X).
+\\
+
+\subsubsection{Quasi-constant filtering}
+The dataset is initially filtered for constant variable values before entering the ensemble. Now, we also exclude from the graph result all variants which show a quasi-constant behaviour: If the amount of variant values different from the whole variable mode differs more than 10-20\% of the total number of cases (220), the feature is ruled out. E.g. assuming a dataset of 100 samples, and 40 cases + 60 controls distribution, mode = 0, 40$\times$0.2 = 8, then the total added number of 1's and 2's required to stay is at least 8.
+
+\subsubsection{Complexity}
+The method contains 4 inner loops, spread across 4 protected methods.
+\\
+
+\textbf{Best case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v == t) then:
+\begin{center}
+Min. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T - U\\    
+\end{center}
+
+\textbf{Worst case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v != t) then:
+\begin{center}
+Max. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T\\    
+\end{center}
+
+
+Where: \textit{Sequentials amount} = S, \textit{Splits per sequential} = P, \textit{Variable set per split} = V and \textit{number of ensemble’s top variables} = T
+
+\subsection{Grouping variables}
+Given a configuration which establishes the relations among variables, we use a second script to re-count the votes. When the votes are counted, if a variant belongs to a group, its vote will be added to its group representative, correcting then the vote split theory. 
+
+\subsubsection{Approaches to establish relations}
+All strategies group variables and set a \textit{representative} of the group: the most connected node within the connected component (default).
+
+\label{methods:grouping:approaches}
+\textbf{Rivalry}\\
+In order to solve the rivalry problem, we group together variants which still hold a relation after the applied filters. The Strength Score among items indicates how large the rivalry is. 
+\\
+We use graph structures to gain full advantage of graph theory functions and heuristics. Strenghts Score is set as the weight of the edge connecting a pair of nodes. 
+Items belonging to the same connected component form individual groups. Community detection strategy Multilevel \cite{Blondel2008FastNetworks} based on edge weight is applied within all connected components to perform a second split in highly complex items.
+\\
+
+\textbf{Spearman Correlation}\\
+All features have been compared to each other to assess their Spearman correlation score in order to measure their comonoticity. If their score is high, at classifier level, they will have the same discriminatory power. Each pair obtaining an absolute score above 0.95 are \emph{linked} together under the same group. The representative is picked randomly.
+
+For the following grouping approaches, we use the labels of each SNP, which follow the format: (chromosome-locus-.-referenceAllele-observedAllele).
+\\
+
+\textbf{1k loci distance}\\
+We group SNPs which are at a maximum of 1000 bases distance using Python scripts which split labels and merge Data Frame labels (column names).
+\\
+
+\textbf{10k loci distance}\\
+We group SNPs which are at a maximum of 10.000 bases distance using Python scripts which split labels and merge Data Frame labels (column names).
+\\
+
+\textbf{Gene translation}
+Each label has been trimmed to extract chromosome number and locus. This information is used to query the RS identifier of an SNP, and retrieve its Gene Symbol and consequence. SNPs belonging to the same gene are grouped. If the SNPs is targeted as a non-synonymous mutation we assume the product will be altered, hence the grouping is more accurate.
+
+\subsection{Application to original results}
+We use an already calculated \emph{ensemble} to perform the swaps. Within this model, we find information about the features picked individually by \emph{sequential}. Counting the votes of each sequential delivers the final vote score per feature.
+\\
+
+Each of the approaches in subsection \ref{methods:grouping:approaches} establish a relation among features that might be competing for the votes. Grouping allows us to aggregate their votes and overcome vote split.
