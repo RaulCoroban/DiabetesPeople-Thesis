@@ -1,7 +1,26 @@
-[TO-REFACTOR]
+% mensaje: que se ha hecho en este trabajo
+% esto es el por qué del estudio
+Redundant variables reduce the predictive power of actual informative features when it comes to discrete data. Besides, their presence increase time complexity both at \emph{ensemble} level and in our \emph{swapping} workflow, since the feature's set size is kept extensive. At a more in-depth level, regarding ensemble techniques where a pool of models cast their votes on variables, they influence rival features importance decadence by shadowing them. By detecting these rival variants, we can correct the results a regular ensemble run delivers, and aim for a more accurate outcome.
+\\
 
-Redundant variables reduce the predictive power of actual informative features. Besides, their presence increase time complexity both at \emph{ensemble} level and in our \emph{swapping} workflow.
+To reach this point, we have developed the \emph{swapping} approach which assesses the individual rivalry among variables. Its conclusions are tested using synthetic data which whose veracity we can check, and estimate the algorithm overall suitability to the task. Then, its application on the real T2D database delivered a list of features that were forwarded back to the labs to aid and guide their further investigation. Also, deep results analysis and insight provided by biology experts regarding the relevancy of the outcomes, helped in tuning the \emph{swapping} approach.
+\\
 
-Data type heavily influences in swapper performance in detecting rivalry.
+Detection of rival features is maximal when we are dealing with continuous variables which contain a signal, i.e. they have enough variability to enhance estimator's discerning power. In this work, usage of categorical data --which is near the extreme case of boolean values-- we are forced to apply filters which overcome constant and quasi-constant variants given that, intrinsically, they are interchangeable.
+\\
 
-Feature selection on homogeneous categorical data set containing thousands of variables needs careful management of relations and dependencies based on sole values. Semantical information such as items (gene, proteins, etc.) interactions can ease the task.
+All in all, the application of the approach serves as a corrector of a subset of the Ensemble Feature Selector's limits.
+% para llegar a ello se ha: desarollado de un algoritmo
+% experimentacion con datos sinteticos para validar su buen comportamiento y llegar a una implementacion optima
+% experimentado con datos reales
+% reordenacion de las variable relevantes
+
+% mensaje
+% el trabajo del analista de datos termina aqui. 
+% coger la frase 
+% We'll be developing an algorithm which proposes a list of features that contribute to a better prediction of disease cases. The list of variables will be later forwarded to the expert team to be validated. 
+% There are no direct biological insights to be found, nor biomarkers to be discovered.
+% y torcerla para decir que ahora toca colaborar con biologos, genetistas , bioinformaticos para confirmar la relevancia sugerida por el analisis de los datos.
+
+% mensaje: algo como: la capacidad de deteccion de variables rivales es maxima con variables continuas y con señal, es decir que varian. En el caso extrmo de variables booleanas, hay que descartar del analisis las variables casi-constantes dado que, intrinsicamente, se van a poder intercambiar.
+

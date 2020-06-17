@@ -1,24 +1,40 @@
+% mensaje del parafo:
+% utilidad de la seleccion de caracteristicas en datos sanitarios
 Applying Feature Selection techniques to medical data such as clinical, genomic, proteomic or metabolomic information could solve two important medical problems. One problem is related to the task of finding which are the relevant variables involved in a disease, response to treatment, survival time, relapse probability, etc. It could lead to understand better the disease mechanisms, evaluate the factors that are involved or even propose new hypotheses about factors that have not been taken into account until this moment. The second problem is to perform variable reduction and learn a predictive model with the best possible performance to cost ratio by using the minimum set of diagnostic variables. This estimator could then be used as an aid in clinical decisions or as an indicator for research. In this case, the focus can be moved from the relevancy of the reduced variable subset to the final performance of the model. 
 \\
 
-Despite the considerable efforts made in capturing health data, the common situation is still having much more variables than observations (individuals). While the number of observations is usually around hundreds or thousands, the number of variables could reach millions. This is an unfavourable condition for any Machine Learning algorithm (Bellman's curse of dimensionality \cite{Bellman2015AdaptiveTour}). Ensemble feature selection received increasing attention during the last decade \cite{Bolon-Canedo2019EnsemblesTrends} \cite{Pes2020EnsembleDomains} and consists in combining the output of several inducers applied on distinct subset of a database. It results in an improvement of the selection stability and robustness to the lack of observations. Nevertheless, more work is required especially with relevant but redundant variables which tend not to be selected. 
+% mensaje del parafo:
+% complejidad de los datos sanitarios (pocas observaciones, muchas variables)
+Despite the considerable efforts made in capturing health data, the common situation is still having much more variables than observations (individuals). While the number of observations is usually around hundreds or thousands, the number of variables could reach millions. This is an unfavourable condition for any Machine Learning algorithm (Bellman's curse of dimensionality \cite{Bellman2015AdaptiveTour}). 
 \\
 
-We'll be developing an algorithm which proposes a list of features that contribute to a better prediction of disease cases. The list of variables will be later forwarded to the expert team to be validated. 
-There are no direct biological insights to be found, nor biomarkers to be discovered. Also, we study the behaviour of ensemble feature selection with redundant variables, interaction of which is commonly unknown and intricate to decipher.
+% mensaje del parafo:
+% aproximacion ensemble para resolverlo pero nueva limitacion con las variables rivales
+Ensemble feature selection received increasing attention during the last decade \cite{Bolon-Canedo2019EnsemblesTrends} \cite{Pes2020EnsembleDomains} \cite{Abeel2009RobustMethods} \cite{BenBrahim2017EnsembleStudy} and consists in combining the output of several inducers applied on distinct subset of a database. It results in an improvement of the selection stability and robustness to the lack of observations. Nevertheless, more work is required especially with relevant but redundant variables which tend not to be selected. 
 \\
 
-\subsection{Ensemble}
-The workflow of the Ensemble we used to obtain the starting data of this work is described in Figure \ref{fig:ensemble-diagram}. Its understanding is crucial for building our workflow since it relies on an \emph{ensemble} generated object.
+% mensaje del parafo:
+% objetivo del estudio: identificar las variables rivales para agruparlas y mejorar la calidad de la lista de relevantes proporcionado por la seleccion ensemble
+% TODO
+We aim to identify rival variants among the feature set items, which we group in order to propose a filtered list of features that contribute to a better prediction of disease cases. There are no direct biological insights to be found, nor biomarkers to be discovered. Also, we study the behaviour of ensemble feature selection with redundant variables, interaction of which is commonly unknown and intricate to decipher \cite{Saeys2007ABioinformatics}.
+\\
+
+% mensaje de la seccion:
+% presentar el algoritmo Ensemble para poder explicar correctamente el swapper en la parte 2.x. algoritmo swapper (o como se llame)
+The workflow of the Ensemble Feature Selection we used internally to obtain the starting data of this work is described in Figure \ref{fig:ensemble-diagram}. Its understanding is crucial for building our workflow since it relies on an \emph{ensemble} generated object.
 \\
 
 \begin{figure}[!htpb]
     \centering
     \includegraphics[width=\linewidth]{Minor Thesis/figures/diagrams/Ensemble.png}
-    \caption{Ensemble workflow. (a) Dataset in matrix format. (c) Resample the data using a \emph{resampling without replacement} technique. (d) Create feature subsets, overlap among subsets is allowed. (e) Apply several feature selectors to each split, then evaluate their performance iteratively to achieve the best predictive variable subset. Each run delivers a \emph{sequential}. (e) Discard sequentials which do not achieve an overall score above a set threshold. (f) Aggregate sequentials results: Each feature appeareance in a sequential result adds a vote to the feature. (g) Return the full list of ranked features, discarding those not voted.}
+    \caption{Ensemble workflow. (a) Dataset in matrix format. (b) Resampling data \emph{without replacement}. (c) Apply several feature selectors to each split, then evaluate their performance iteratively to achieve the best predictive variable subset. Each run delivers a \emph{sequential}. (d) Discard sequentials which do not achieve an overall score above a set threshold. (e) Aggregate Sequentials results: Each feature appearance in a sequential result adds a vote to the feature. (f) Return the full list of ranked features, discarding those which have not obtained enough votes over the threshold.}
     \label{fig:ensemble-diagram}
 \end{figure}
-An \epmh{ensemble} assigns a vote to a variable each time this variable belongs to a valid sequential. Sequential validation is based on a minimum threshold accuracy, termination and error-free results.
+
+Ensemble approach attempts to combine different opinions from a group of estimators working on several splits of a dataset. For each set of data, a subset of features that best predicts the task is computed, hence multiple results consensus delivers a multi-perspective observation of the problem. 
+\\
+
+In our particular case, an \epmh{ensemble} assigns a vote to a variable each time this variable belongs to a valid sequential. A Sequential\footnote{Several approaches are available, but this project focuses on \href{forward/backward}{http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/} Sequentials since they use an \emph{overall approach} when considering data.} is a weak feature selector. It uses a greedy approach and, although their computation tends to be heavy, they are powerful and complete. Sequential validation is based on a minimum threshold accuracy, termination and error-free behaviour.
 \\
 
 When an ensemble method attempts to assign votes to all variables, those features which hold a significant similarity might alternately receive the votes. E.g. assuming X and Y have a similarity of 0.99 and they obtain 5 and 10 votes respectively, their prediction might have been the same since they are highly similar at the eyes of the classifier. The total maximum of votes (15) has been split in two variables, and both have lost positions in the ranking. We name this phenomenon \emph{rivalry}.
@@ -26,7 +42,7 @@ When an ensemble method attempts to assign votes to all variables, those feature
 Either highly redundant features (due to quasi-constant values, etc.) or features holding a strong rivalry hamper ensemble's aim to accurately rank variants.
 \\
 
-In this project we introduce an approach which performs an iterative swap between each of the variants in a feature set (already calculated in an individual sequential) and the missing features picked by the full ensemble (as a result of a consensus function) in order to perform a retraining of the sequentials and further compare the prediction results.
+In this project we introduce an approach which performs an iterative swap between each of the variants in a feature set (already calculated in an individual sequential) and the missing features picked by the full ensemble (as a result of a consensus function) in order to perform a retraining of the Sequentials and further compare the prediction results.
 \\
 
 This new approach will be added and assessed against other ways of clustering votes and correcting ranks.
@@ -36,4 +52,4 @@ In our definition of rivalry, two variables compete against each other with rega
 More precisely, if the original prediction (A) and the set-swapped prediction (B), are similar more than a custom threshold (overlap(A, B) >= threshold), we consider the pair of features swapped are highly linked.
 \\
 
-Therefore, assessing one-to-one prediction similarity and investigating paired correlation allows us to re-rank the original ensemble output, helping us to tackle the vote rivalry problem. This assists the Maximum Relevance Minimum Redundancy (MRMR) approach used in problems which face up dimensionality issues by reducing redundancy. As for the maximal relevance component, it is mainly up to the \emph{ensemble} procedure to solve. However, accuracy filters are also available in our work.
+Therefore, assessing one-to-one prediction similarity and investigating paired correlation allows us to re-rank the original ensemble output, helping us to tackle the vote rivalry problem. This assists the Maximum Relevance Minimum Redundancy (MRMR) \cite{Auffarth2010ComparisonImages}\cite{Peng2005FeatureMin-Redundancy} approach used in problems which face up dimensionality issues by reducing redundancy. As for the maximal relevance component, it is mainly up to the \emph{ensemble} procedure to solve. However, accuracy filters are also available in our work.

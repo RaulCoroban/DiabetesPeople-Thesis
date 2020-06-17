@@ -39,7 +39,125 @@ Data for preprocessing is highly important since we require results normalizatio
 		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN53333001.png}
 		\caption{threshold = 1}
 	\end{subfigure}
-	
+	\caption{Available relations when increasing the \emph{relation score} threshold. Edge thickness indicates strength of relation.}
 	\label{fig:tosaqui1}
-	\caption{Available relations when increasing the \emph{relation score} threshold.}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/A.png}
+		\caption{max(index)}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/B.png}
+		\caption{max(index)-1}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/C.png}
+		\caption{max(index)-2}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/D.png}
+		\caption{max(index)-3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/E.png}
+		\caption{max(index)-4}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.15\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/nn/F.png}
+		\caption{max(index)-5}
+	\end{subfigure}
+	\caption{Graph building evolution. Not-normalised results. We indicate values and position as: for (value, index) $\in$ Ascending Ordered Weights, i.e. the highest index contains the highest weight.}
+	\label{fig:graph-evo-nn}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/A.png}
+		\caption{max(index)}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/B.png}
+		\caption{max(index)-1}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/C.png}
+		\caption{max(index)-2}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/D.png}
+		\caption{max(index)-3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/E.png}
+		\caption{max(index)-4}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/F.png}
+		\caption{max(index)-5}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.13\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/sa/G.png}
+		\caption{max(index)-6}
+	\end{subfigure}
+	\caption{Graph building evolution. Normalised results using chance weights (success/overall). We indicate values and position as: for (value, index) $\in$ Ascending Ordered Weights, i.e. the highest index contains the highest weight.}
+	\label{fig:graph-evo-sa}
+\end{figure}
+
+\subsection{Gain/Loss summaries}
+Accuracy may vary along the swapping method, hence can also derive an overview of the general tendency as shown in Figure \ref{fig:gainloss}. The difference score is calculated by substracting the new accuracy (using the new swapped set) to the old one (original set). If the result is positive, we tag it as \emph{gain}, and otherwise as \emph{loss}. If the scores are exactly the same, we use \emph{equal}.
+
+\begin{figure}[!hptb]
+	\centering
+% 	\captionsetup{justification=centering}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_ensemble1000_RCN5333300.png}
+		\caption{1000 samples (RCN) 5 Inf, 3 Red, 3 Copy, 3 Cosine, 3 Noise}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_ensemble1000_RN5053200.png}
+		\caption{1000 samples (RN) 5 Inf, 0 Copy, 5 Red., 3 Cosine, 2 Noise}
+	\end{subfigure}
+	\caption{Gain/Loss summary on synthetic data. Full lines on each side indicate the maximum value for each group (Gain or Loss). Dashed lines compute the median of the group. The middle line tags the 0 value for reference purposes.}
+	\label{fig:gainloss}
+\end{figure}
+
+\subsection{Extra Histograms}
+\label{section:suppl:extra-hist}
+\begin{figure}[!hptb]
+	\centering
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist975.png}
+		\caption{Correlation distribution at Rivalry Score = 0.975}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist95.png}
+		\caption{Correlation distribution at Rivalry Score = 0.95}
+	\end{subfigure}
+	\label{fig:triade-hist}
+	\caption{Correlation scores of remaining nodes at different Rivalry Scores, }
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics{Minor Thesis/figures/histo/Counter.png}
+    \caption{Exploration of values within features. The histogram displays the frequency of variables containing a set number of 0's. Values near 488 are considered to be quasi-constant. The same exploration has been performed to count the number of 1's and 2's (data not shown).}
+    \label{fig:counter}
 \end{figure}

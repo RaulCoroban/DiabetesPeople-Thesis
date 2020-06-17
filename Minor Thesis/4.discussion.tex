@@ -1,1 +1,13 @@
-[TO-DO]
+% mensaje: 
+Feature selection on homogeneous categorical data set containing thousands of variables needs careful management of relations and dependencies based on sole values. Any semantical information such as gene or proteins interactions should be taken into account as a possible support entity. Also mention, one of the particularities of the ensemble method is to be versatile and allow all kinds of data. It would require an extensive library to consider each particular type of data and extract --or correct-- best possible the outcome.
+\\
+
+% mensaje:
+Regarding the accuracy of results, the available parameters allow for a more strict or loose constraint setting. Severe thresholds like Rivalry score = 1 and Quasi-constant leave-out index = 0.3 (or higher, closer to 0.5) would result in a more solid result. Nevertheless, any nodes or relations fulfilled the requirements, so no graph could be built from it. Based on this fact, we're forced to establish a trade-off among both constraints, according to our needs.
+\\
+
+% mensaje:
+In our specific case, the related nodes hold a semantic relation too\footnote{The variant names are hidden for confidentiality purposes, its veracity can be checked by requesting the real data access (See \ref{availability})}. 65\% of the connections relate SNPs which are (1) in the same chromosome, and (2) their loci base-distance is within 1-10k. Considering the grouping approaches established in \ref{methods:grouping:approaches} which were proposed with an experimental objective, there might be some support from the swapper's side on it. In any case, SNPs located in different chromosomes or faraway within the same chromosome still hold 35\% of the cases, which should be further analysed from a biological point of view to validate to which extent this result is accurate.
+\\
+
+As seen in the results, data type heavily impact on swapper's performance when aiming for rivalry detection. Continuous values, due to their variant nature, allow for a better and more accurate discerning than discrete values or categorical labels. However, this flaw is corrected by applying slight normalisations in the post-process, which are not error-free either.
