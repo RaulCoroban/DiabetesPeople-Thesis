@@ -3,10 +3,10 @@
 % describir las variable y valores objetivos
 % confidencialidad y accesibilidad
 \subsection{Diabetes Dataset}
-Originally, the provided data contains 5.703.141 exoms from 488 anonymous patients, labelled as cases and controls. The dataset has been filtered for features containing more than 30\% missing values, and constant values.
+Originally, the provided data contains 5.703.141 exoms from 488 anonymous patients. The dataset has been filtered for features containing more than 30\% missing values, and constant values, then finally forwarded to this project.
 \\
 
-The start data for this work contains 488 patient samples across 15,582 SNPs. 120 patient exoms come from \emph{Egabro} and \emph{Pizarra} populational cohorts, from patients above 40 years old. These samples were picked from individuals showing insuline-resistance at the study's starting point and Type 2 Diabetes (T2D) at its closure. Remaining 366 exoms come from CIBERDEM\footnote{CIBERDEM: \emph{Centro de Investigación Biomédica en Red de Diabetes y Enfermedades Metabólicas Asociadas} - \url{https://www.ciberdem.org}} Biobank and DNA National Biobank\footnote{\emph{Banco Nacional de ADN}: \url{http://www.bancoadn.org}}. Samples were collected from individuals among 40 and 65 years old and a Body Mass Index (BMI) between 25 y 34.9 Kg/$m^{2}$
+The start data for this work contains 488 patient samples across 15,582 SNPs. 120 patient exoms come from \emph{Egabro} and \emph{Pizarra} populational cohorts, from patients above 40 years old. These samples were picked from individuals showing insuline-resistance at the study's starting point and Type 2 Diabetes (T2D) at its closure. Remaining 366 exoms come from CIBERDEM\footnote{CIBERDEM: \emph{Centro de Investigación Biomédica en Red de Diabetes y Enfermedades Metabólicas Asociadas} - \url{https://www.ciberdem.org}} Biobank and DNA National Biobank\footnote{\emph{Banco Nacional de ADN}: \url{http://www.bancoadn.org}}. Samples were collected from individuals among 40 and 65 years old and a Body Mass Index (BMI) between 25 y 34.9 Kg/$m^{2}$.
 \\
 
 % mensaje: descripcion de las variables y valores objetivos y criterio WHO
@@ -14,7 +14,7 @@ WHO criteria were followed for classifying cases and samples (out of the scope o
 \\
 
 % mensaje: datos ofuscados pero accesible bajo demanda
-Real variants labels have been encrypted due to confidentiality reasons. Their availability is set under request. See \ref{availability}
+Real variants labels have been encrypted due to confidentiality reasons. Their availability is set under request (See Section \ref{availability}).
 
 % mensaje: filtrado previo de los datos
 
@@ -23,20 +23,19 @@ Real variants labels have been encrypted due to confidentiality reasons. Their a
 % presentar el algoritmo de swapping de variables
 \subsection{Swapping Algorithm}
 \label{section:methods:pipeline}
-A run on the \emph{ensemble} tool results in an object containing all the information from each Sequential run, its inner splits and features used for prediction.
+A run on the \emph{Ensemble Feature Selector} results in an object containing all the information from each Sequential run, its inner splits and features used for prediction.
 \\
 
-% mensaje: se parte de las variables relevantes obtenidas por un ensemble
-The module developed in this work loads an ensemble object, and gets its top-ranked variables (top289) which obtain more than 8 votes. The 8 votes threshold has been obtained through different procedures out of the scope of this work. We obtained 289 variants.
+% mensaje: se parte de las variables relevantes obtenidas por un Ensemble
+The module developed in this work loads an Ensemble object, and gets its top-ranked variables (top298) which obtain more than 8 votes. The 8 votes threshold has been obtained through different procedures out of the scope of this work. We obtained 289 variants.
 \\
 
 % mensaje: se intercambia las variables anteriores en todos los subconjuntos obtenidos por los secuenciales internos
-Then it iterates over the valid Sequentials (zone (d) in Figure \ref{fig:ensemble-diagram}) and for each set of its original variables Sequential the model is re-trained. Each Sequential contains the necessary information to run the training under the same conditions as originally, hence we obtain a reference target. Last, each variable from top289 in the Sequential is swapped by each variable in the original set to run a new model training under the same conditions, except the feature set.
+Then it iterates over the valid Sequentials (zone (d) in Figure \ref{fig:Ensemble-diagram}) and for each set of its original variables Sequential the model is re-trained. Each Sequential contains the necessary information to run the training under the same conditions as originally, hence we obtain a reference target (RT). Last, each variable from top298 in the Sequential is swapped by each variable in the original set to run a new model training under the same conditions, except the feature set.
 We can draw a new accuracy score on the new feature set, and also relations among the pairs of variables swapped.
 \\
 
-\emph{Pseudocode:}\\
-
+Next, we can find a \emph{Pseudocode} of the \emph{Swapping} procedure which is exemplified in Table \ref{tbl:swap-example}:
 \begin{enumerate}
     \item Select \textcolor{blue}{topN}
     \item Loop for each S in Sequential:
@@ -45,9 +44,9 @@ We can draw a new accuracy score on the new feature set, and also relations amon
         \begin{itemize}
             \item Train model on Train using \textcolor{red}{Original Vars}
             \item Evaluate on Test: generate Reference Target \textcolor{orange}{(RT)}
-            \item Loop for each \textcolor{red}{U} $\in$ Original Vars:
+            \item Loop for each \textcolor{red}{U}  $\in$  Original Vars:
             \begin{itemize}
-                \item Loop for each \textcolor{blue}{V} $\in$ topN \and $\not \in$ Original Vars:
+                \item Loop for each \textcolor{blue}{V}  $\in$  topN \and $\not \in$ Original Vars:
                 \begin{itemize}
                     \item Swap \textcolor{red}{U} for \textcolor{blue}{V}
                     \item Re-train model on Train split.
@@ -88,11 +87,11 @@ We can draw a new accuracy score on the new feature set, and also relations amon
 \end{tabular}%
 }
 \label{tbl:swap-example}
-\caption{Generated sets for re-training using [A, B, D, E] as topN and [B, C, D, F, G] as Original Variables. Rows under "Swap Iterations" are the new features used for retraining, while "Original" will deliver the reference original prediction. Variables A and E are the only ones allowed to be swapped. B and D cannot be used for this particular Original Variables set. For this iteration, the number of attempts to swap is 0 for B and D, however, in another set they might have a chance.}
+\caption{Swapping example using [A, B, D, E] as topN and [B, C, D, F, G] as Original Variables. Rows under "Swap Iterations" are the new features used for retraining, while "Original" will deliver the reference original prediction. Variables A and E are the only ones allowed to be swapped. B and D cannot be used for this particular Original Variables set. For this iteration, the number of attempts to swap is 0 for B and D, however, in another set they might have a chance.}
 \end{table}
 
 % mensaje: compara los valores objetivos predichos tras intercambio de variable con los targets originales. Medir la similitud de prediccion - presentar metrica de similitud.
-We predict one target using the original set of variables within a Sequential (\emph{reference target}, \textcolor{orange}{RT}), and one new target using the new set of variables after the swap (\emph{swap target}, \textcolor{green}{ST}). Then, we calculate the overlap percentage of both targets, and set its score as the \emph{Swap Score} among the pair of swapped variables which originated the set difference. Scores near 0 indicate \emph{reference target} and \emph{swap target} predictions not look alike, whereas scores near 1 indicate a significant match.
+We predict one target using the original set of variables within a Sequential (\emph{reference target}, \textcolor{orange}{RT}), and one new target using the new set of variables after the swap (\emph{swap target}, \textcolor{green}{ST}). Then, we calculate the overlap percentage of both targets (using \emph{accuracy score}), and set its score as the \emph{Swap Score} among the pair of swapped variables which originated the set difference. Scores near 0 indicate \emph{reference target} and \emph{swap target} predictions not look alike, whereas scores near 1 indicate a significant match.
 
 \\
 
@@ -117,30 +116,33 @@ We predict one target using the original set of variables within a Sequential (\
 \end{table}
 
 
-After a full run which performs all the possible swaps within all Sequential using top289 variants, we obtain object results specifying (1) variables swapped, (2) new accuracy score obtained, (3) target prediction similarity --the Swap Score-- and (4) other metadata such as original and new sets display.
+After a full run which performs all the possible swaps within all Sequential using top298 variants, we obtain object results specifying (1) variables swapped, (2) new accuracy score obtained, (3) target prediction similarity --the Swap Score-- and (4) other metadata such as original and new sets display.
 
 % mensaje: presentar metrica de rivalidad
 To establish the relation strength among two swapped variables, we count the number of times it has reached a certain threshold. E.g. assuming toy example at threshold = 0.9 in which two variables have been swapped 5 times scoring [0.763, 0.937, 0.945, 0.373, 0.673] of Swap Score, their Rivalry Score would be 2/5.
 \\
 
 % mensaje: configuracion de la experimentacion
-In this work, only results scoring above 0.75 (1 is max.) accuracy and 0.95 (1 is max.) Swap Score are kept. The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
+To illustrate the rivalry relations, the toy exemple in Section \ref{section:results-toy}, only results scoring above 0.75 model accuracy (1 is max.) and 0.95 Swap Score (1 is max.) are kept. The results are then clustered in a relation matrix of \textit{removed variables} across \textit{added variables} as shown in Table \ref{tbl:swapvars}. 
 \\
 
-The \emph{ensemble} method delivers the most voted features as the result set (RS). The items $\in$ RS are swapped for each element of the Original Sequential set (OS), and our algorithm actively avoids having duplicated features in the train/test to prevent multicollinearity problems. Therefore, due to the nature of the problem, there is a higher chance for an item $\in$ RS to be rejected, as its number of votes is higher, i.e. the more votes it gets out of an ensemble execution, the higher the chances of any randomly picked OS to contain it. To tackle this problem, the Rivalry Score does not count the number of times the threshold has been met using a whole unit, but weights it instead considering the overall chances variables have to be swapped:
+The \emph{Ensemble} method delivers the most voted features as the result set (RS). The items  $\in$  RS are swapped for each element of the Original Sequential set (OS), and our algorithm actively avoids having duplicated features in the train/test to prevent multicollinearity problems. Therefore, due to the nature of the problem, there is a higher chance for an item  $\in$  RS to be rejected, as its number of votes is higher, i.e. the more votes it gets out of an Ensemble execution, the higher the chances of any randomly picked OS to contain it. The Rivalry Score is thus normalised with the number of times the swap is attempted, i.e. it weights the Rivalry score considering the overall chances variables have to be swapped in order to establish fairness:
 
 \begin{center}
     Rivalry Score = \#successful swaps / \#all attempts to swap overall
 \end{center}
 
+
+\subsection{Rivalry Relation Matrix}
 As a result, we obtain a weighted adjacency matrix which we convert to edgelist format and transform to graph network whose edges represent the weight of the Swap Score.
 \\
 
 % mensaje: describir el filtro de las casi constantes, 
 %          concluir que hubiera estado mejor filtrar estas variables
-%          anteriormente al ensemble y que es una ensenanza del estudio
+%          anteriormente al Ensemble y que es una ensenanza del estudio
 
-The original dataset is initially filtered for constant variable values before entering the ensemble since they are not relevant for any estimator. Now, after a quick exploration of the data in which we noticed the values contained in a feature might be dominant (See Suppl. Material Figure \ref{fig:counter}), we also exclude from the graph result all variants which show a quasi-constant behaviour: If the amount of variant values different from the whole variable mode differs more than 10-20\% of the total number of cases (220), the feature is ruled out. E.g. assuming a dataset of 100 samples, and 40 cases + 60 controls distribution, mode = 0, then 40$\times$0.2 = 8, so the total added amount of 1's and 2's required to stay is at least 8.
+\subsection{Quasi-constant Filtering}
+The original dataset is initially filtered for constant variable values before entering the Ensemble since they are not relevant for any estimator. Now, after a quick exploration of the data in which we noticed the values contained in a feature might be dominant (See Suppl. Material Figure \ref{fig:counter}), we also exclude from the graph result all variants which show a quasi-constant behaviour: If the amount of variant values different from the whole variable mode differs more than 10-20\% of the total number of cases (220), the feature is ruled out. E.g. assuming a dataset of 100 samples, and 40 cases + 60 controls distribution, mode = 0, then 40$\times$0.2 = 8, so the total added amount of 1's and 2's required to stay is at least 8.
 We name this parameter \emph{Quasi-constant Leave-Out Index} (QLOI).
 \\
 
@@ -152,35 +154,37 @@ Given its relevance in easing the, the removal of such variables has been added 
 The method contains 4 inner loops, spread across 4 protected methods.
 \\
 
-\textbf{Best case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v == t) then:
+\textbf{Best case scenario:} ($\forall$ v $in$ V, v  $\in$  T, where U = v  $\in$  V, t  $\in$  T, v == t) then:
 \begin{center}
 Min. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T - U\\    
 \end{center}
 
-\textbf{Worst case scenario:} ($\forall$ v $in$ V, v $\in$ T, where U = v $\in$ V, t $\in$ T, v != t) then:
+\textbf{Worst case scenario:} ($\forall$ v $in$ V, v  $\in$  T, where U = v  $\in$  V, t  $\in$  T, v != t) then:
 \begin{center}
 Max. Iterations $\approx$ S $\times$ P $\times$ V $\times$ T\\    
 \end{center}
 
 
-Where: \textit{Sequentials amount} = S, \textit{Splits per Sequential} = P, \textit{Variable set per split} = V and \textit{number of ensemble’s top variables} = T
+Where: \textit{Sequentials amount} = S, \textit{Splits per Sequential} = P, \textit{Variable set per split} = V and \textit{number of Ensemble’s top variables} = T
 
 % mensaje: metodo de agrupacion de las variables rivales
 %          se probaron varios metodos, basados en los datos como en conocimiento a priori
 
 \subsection{Grouping rival variables}
-% mensaje: las variables rivales (intercambiables) se deben de agrupar en una sola. Permite corregir y reordenar la lista incial del ensemble haciendo emerger nuevas variables relevantes que quedaban ocultas por la division del voto.
-Given a configuration which establishes the relations among variables, we use a second script to re-count the votes. When the votes are counted, if a variant belongs to a group, its vote will be added to its group representative, correcting the vote split theory. 
+% mensaje: las variables rivales (intercambiables) se deben de agrupar en una sola. Permite corregir y reordenar la lista incial del Ensemble haciendo emerger nuevas variables relevantes que quedaban ocultas por la division del voto.
+Given a configuration which establishes the relations among variables, we use a second script to re-count the votes taking into account the group formation. The votes are counted at a group level, i.e. if a variant belongs to a group and it receives a vote from the Feature Selector, its vote will be added to its group representative (unless it is the representative itself), correcting the vote split. 
 
-All strategies group variables and set a \textit{representative} of the group: the most connected node within the connected component (default). For the following grouping approaches, we use the labels of each SNP, which follow the format: \emph{chromosome-locus-.-reference Allele-observed Allele}.
+All strategies group variables and set a \textit{representative} of the group: the most connected node within the connected component (default).
 \\
+
+During this project, several grouping methods have been tested. Initially, groups have been computed using Spearman Correlation. This project contributed adding 1k loci distance grouping, 10k loci distance and same-gene SNPs grouping:
 
 \textbf{Rivalry}\\
 In order to solve the rivalry problem, we group together variants which still hold a relation after the applied filters. The Rivalry Score among items indicates how large the rivalry is.
 \\
 
 We use graph structures to gain full advantage of graph theory functions and heuristics. Rivalry Score is set as the weight of the edge connecting a pair of nodes. 
-Items belonging to the same connected component form individual groups. Community detection strategy Multilevel \cite{Blondel2008FastNetworks} based on edge weight is applied within all connected components to perform a second split in highly complex items.
+Items belonging to the same connected component form individual groups. Community detection strategy Multilevel \cite{Blondel2008FastNetworks} based on edge weight is applied within all connected components to perform a second split in highly complex networks.
 \\
 
 \textbf{Spearman Correlation}\\
@@ -197,10 +201,15 @@ We group SNPs which are at a maximum of 10.000 bases distance using Python scrip
 \\
 
 \textbf{Gene translation}
-This approach is based on the final product alteration. Each label has been trimmed to extract chromosome number and locus. This information is used to query the RS identifier of an SNP, and retrieve its Gene Symbol and consequence. SNPs belonging to the same gene are grouped, assuming that if the targeted SNPs are labelled as non-synonymous mutations, we assume the product will be altered by any of the items contained in the gene.
-
-\subsection{Application to original results}
-We use an already calculated \emph{ensemble} to perform the swaps. Within this model, we find information about the features picked individually by \emph{Sequential}. Counting the votes of each Sequential delivers the final vote score per feature.
+This approach is based on the final product alteration. Each label has been trimmed to extract chromosome number and locus. This information is used to query the RS identifier of an SNP (See Section \ref{section:rsid}), and retrieve its Gene Symbol and consequence. SNPs belonging to the same gene are grouped, assuming that if the targeted SNPs are labelled as non-synonymous mutations, we assume the product will be altered by any of the items contained in the gene.
 \\
 
-Each of the approaches in subsection \ref{methods:grouping:approaches} establish a relation among features that might be competing for the votes. Grouping allows us to aggregate their votes and overcome vote split.
+\subsection{Results enrichment}
+\label{section:rsid}
+Following re-ranking, we used the results labels (\emph{chromosome-locus-.-reference Allele-observed Allele}) to retrieve their rsID number via web-scrapping on dbSNP provided by NCBI\footnote{National Center of Biotechnology Information - \url{https://www.ncbi.nlm.nih.gov/snp/}}. The ID gave us access to NCBI Variation Services\footnote{\url{https://api.ncbi.nlm.nih.gov/variation/v0/#/RefSNP/get_refsnp__rsid_}} and SNPedia\footnote{\url{https://www.snpedia.com}} APIs to retrieve exact gene names, gene identifiers, mutation kind and consequence (if any) and Minor Allele Frequencies (MAFs).
+
+\subsection{Experiment Configuration}
+\label{section:cfg}
+Observations described in this work use the following parameters: Min. Swap Score=0.95, Min. Abs. Spearman Correlation=0.15, Max. Abs. Correlation=0.85, QLOI\footnote{Quasi-constant Leave-Out Index}=0.3, and Rivalry Score is not filtered, and it is only used to weight the graph.
+
+Experiments have used all the possible combinations of the following parameters ranges: Swap Score $\in$ [0.95, 0.96, 0.97, 0.98, 0.99, 1], Min.Abs.Correlation $\in$ [0.10, 0.15, 0.2, 0.25, 0.30], Max.Abs.Correlation $\in$ [0.75, 0.80, 0.85, 0.90, 0.95], QLOI $\in$ [0.1, 0.2, 0.3].

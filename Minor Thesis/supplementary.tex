@@ -1,48 +1,13 @@
 \subsection{Python implementation}
-The code is contained in Python classes. The main swapping function is callable as a method class, although the inner loops are split in protected methods, since they are made to work internally. There’s a protected method for each level of depth in the loops of the algorithm described in \ref{section:methods:pipeline}.The information is shared among them via custom objects or the global class attributes.
+The code has been developed in Python 3 and it is contained in classes. The main swapping function is callable as a method class within the ITI's main module. The inner loops are split in protected methods, since they are made to work internally. There’s a protected method for each level of depth in the loops of the algorithm described in \ref{section:methods:pipeline}.The information is shared among them via custom objects or the global class attributes.
 \\
 
 Aside the main objects, there is a Metadata object which stores all the information for future preprocessing of the data and allows recovery on the same spot the execution ended, either due to an intended halt or an error.
-Data for preprocessing is highly important since we require results normalization. This is explained further in the Analysis.
+Data for preprocessing is highly important since we require results normalisation.
 
-\subsection{Relations Evolution on moving threshold}
+\subsection{Edge Evolution on moving threshold}
 \label{suppl:relations}
-
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN5333300_095.png}
-		\caption{threshold = 0.95}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN5333300_096.png}
-		\caption{threshold = 0.96}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN5333300_097.png}
-		\caption{threshold = 0.97}
-	\end{subfigure}
-	
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN5333300_098.png}
-		\caption{threshold = 0.98}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN5333300_099.png}
-		\caption{threshold = 0.99}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{figures/chords/chord_swap_ensemble1000_RCN53333001.png}
-		\caption{threshold = 1}
-	\end{subfigure}
-	\caption{Available relations when increasing the \emph{relation score} threshold. Edge thickness indicates strength of relation.}
-	\label{fig:tosaqui1}
-\end{figure}
-
+% Not-normalised
 \begin{figure}[!htb]
 	\centering
 	\begin{subfigure}[b]{0.15\linewidth}
@@ -78,6 +43,7 @@ Data for preprocessing is highly important since we require results normalizatio
 	\label{fig:graph-evo-nn}
 \end{figure}
 
+% Normalised
 \begin{figure}[!htb]
 	\centering
 	\begin{subfigure}[b]{0.13\linewidth}
@@ -117,47 +83,95 @@ Data for preprocessing is highly important since we require results normalizatio
 	\caption{Graph building evolution. Normalised results using chance weights (success/overall). We indicate values and position as: for (value, index) $\in$ Ascending Ordered Weights, i.e. the highest index contains the highest weight.}
 	\label{fig:graph-evo-sa}
 \end{figure}
+\FloatBarrier
 
 \subsection{Gain/Loss summaries}
-Accuracy may vary along the swapping method, hence can also derive an overview of the general tendency as shown in Figure \ref{fig:gainloss}. The difference score is calculated by substracting the new accuracy (using the new swapped set) to the old one (original set). If the result is positive, we tag it as \emph{gain}, and otherwise as \emph{loss}. If the scores are exactly the same, we use \emph{equal}.
+Accuracy may vary along the swapping method, hence can also derive an overview of the general tendency as shown in Figure \ref{fig:gainloss}. The difference score is calculated by subtracting the new accuracy (using the new swapped set) to the old one (original set). If the result is positive, we tag it as \emph{gain}, and otherwise as \emph{loss}. If the scores are exactly the same, we use \emph{equal}.
 
+% Gain/Loss
 \begin{figure}[!hptb]
 	\centering
 % 	\captionsetup{justification=centering}
 	\begin{subfigure}[b]{0.45\linewidth}
-		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_ensemble1000_RCN5333300.png}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_Ensemble1000_RCN5333300.png}
 		\caption{1000 samples (RCN) 5 Inf, 3 Red, 3 Copy, 3 Cosine, 3 Noise}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
-		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_ensemble1000_RN5053200.png}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/gain_loss/swap_Ensemble1000_RN5053200.png}
 		\caption{1000 samples (RN) 5 Inf, 0 Copy, 5 Red., 3 Cosine, 2 Noise}
 	\end{subfigure}
 	\caption{Gain/Loss summary on synthetic data. Full lines on each side indicate the maximum value for each group (Gain or Loss). Dashed lines compute the median of the group. The middle line tags the 0 value for reference purposes.}
 	\label{fig:gainloss}
 \end{figure}
+\FloatBarrier
+
+\subsection{Swap Score moving threshold}
+% 6 Chords
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_095.png}
+		\caption{threshold = 0.95}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_096.png}
+		\caption{threshold = 0.96}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_097.png}
+		\caption{threshold = 0.97}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_098.png}
+		\caption{threshold = 0.98}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_099.png}
+		\caption{threshold = 0.99}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN53333001.png}
+		\caption{threshold = 1}
+	\end{subfigure}
+	\caption{Available relations when increasing the \emph{Swap Score} threshold. Edge thickness indicates strength of relation which is later converted to Rivalry Score.}
+	\label{fig:six-chords}
+\end{figure}
+\FloatBarrier
 
 \subsection{Extra Histograms}
 \label{section:suppl:extra-hist}
-\begin{figure}[!hptb]
+
+% QLOI
+\begin{figure}[!htb]
 	\centering
-	\begin{subfigure}[b]{0.45\linewidth}
-		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist975.png}
-		\caption{Correlation distribution at Rivalry Score = 0.975}
+	\begin{subfigure}[b]{0.30\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist95.png}
+		\caption{Correlation distribution at Swap Score = 0.95}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.45\linewidth}
-		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist95.png}
-		\caption{Correlation distribution at Rivalry Score = 0.95}
+	\begin{subfigure}[b]{0.30\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist975.png}
+		\caption{Correlation distribution at Swap Score = 0.975}
 	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.30\linewidth}
+		\includegraphics[width=\linewidth]{Minor Thesis/figures/graphs/hist/Hist1.png}
+		\caption{Correlation distribution at Swap Score = 1}
+	\end{subfigure}	
+	\caption{Correlation scores of remaining nodes at different Rivalry Scores.}
 	\label{fig:triade-hist}
-	\caption{Correlation scores of remaining nodes at different Rivalry Scores, }
 \end{figure}
 
-
-\begin{figure}
+% zeroes-count
+\begin{figure}[!ht]
     \centering
-    \includegraphics{Minor Thesis/figures/histo/Counter.png}
+    \includegraphics[width=0.75\linewidth]{Minor Thesis/figures/histo/Counter.png}
     \caption{Exploration of values within features. The histogram displays the frequency of variables containing a set number of 0's. Values near 488 are considered to be quasi-constant. The same exploration has been performed to count the number of 1's and 2's (data not shown).}
     \label{fig:counter}
 \end{figure}
