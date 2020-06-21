@@ -10,7 +10,7 @@ Despite the considerable efforts made in capturing health data, the common situa
 
 % mensaje del parafo:
 % aproximacion Ensemble para resolverlo pero nueva limitacion con las variables rivales
-Ensemble Feature Selection received increasing attention during the last decade \cite{Bolon-Canedo2019EnsemblesTrends} \cite{Pes2020EnsembleDomains} \cite{Abeel2009RobustMethods} \cite{BenBrahim2017EnsembleStudy} and consists in combining the output of several inducers applied on distinct subset of a database. It results in an improvement of the selection stability and robustness to the lack of observations. Nevertheless, more work is required especially with relevant but redundant variables which tend not to be selected. 
+Ensemble Feature Selection has been receiving an increasing attention during the last decade \cite{Bolon-Canedo2019EnsemblesTrends} \cite{Pes2020EnsembleDomains} \cite{Abeel2009RobustMethods} \cite{BenBrahim2017EnsembleStudy} and consists in combining the output of several inducers applied on distinct subset of a database. It results in an improvement of the selection stability and robustness to the lack of observations. Nevertheless, more work is required especially with relevant but redundant variables which tend not to be selected. 
 \\
 
 Indeed, redundant variables are competing for the vote inside the ensemble approach reducing their possibilities to get selected.
@@ -37,11 +37,11 @@ The workflow of the Ensemble Feature Selection we used internally to obtain the 
 Ensemble approach attempts to combine different opinions from a group of estimators working on several splits of a dataset. For each set of data, a subset of features that best predicts the task is computed, hence multiple results consensus delivers a multi-perspective observation of the problem. 
 \\
 
-In our particular case, an \epmh{Ensemble} assigns a vote to a variable each time this variable belongs to a valid Sequential. A Sequential\footnote{Several approaches are available, but this project focuses on \href{forward/backward}{http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/} Sequentials since they use an \emph{overall approach} when considering data.} is a weak feature selector. It uses a greedy approach and, although their computation tends to be heavy, they tend to be powerful and complete. Sequential validation is based on a minimum threshold accuracy, termination and error-free behaviour.
+In our particular case, an \epmh{Ensemble} assigns a vote to a variable each time this variable belongs to a valid Sequential. A Sequential\footnote{Several approaches are available, but this project focuses on \href{http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/}{forward/backward} Sequentials since they use an \emph{overall approach} when considering data.} is a weak feature selector. It uses a greedy approach and, although their computation tends to be heavy, they tend to be powerful and complete. Sequential validation is based on a minimum threshold accuracy, termination and error-free behaviour.
 \\
 
 % OK
-When an Ensemble method attempts to assign votes to all variables, those features which hold a significant similarity might alternately receive the votes. E.g. assuming X and Y have a similarity of 0.99 and they obtain 5 and 10 votes respectively, their prediction might have been the same since they are highly similar at the eyes of the classifier. The total maximum of votes (15) has been split in two variables, and both have lost positions in the ranking. We name this phenomenon \emph{rivalry}.
+When an Ensemble method attempts to assign votes to all variables, those features which hold a significant similarity might alternately receive the votes. E.g. assuming X and Y obtain 5 and 10 votes respectively and they hold a similarity of 95\%, their prediction might have been the same since they are highly similar at the eyes of the classifier. The total maximum of votes (15) has been split in two variables, and both have lost positions in the ranking. We name this phenomenon \emph{rivalry}.
 
 Either highly redundant features (due to quasi-constant values, etc.) or features holding a strong rivalry, hamper Ensemble's aim to identify every relevant variable, and, ultimately, accurately rank variants.
 \\

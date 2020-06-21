@@ -14,7 +14,7 @@ After swapping, the results are observed in Figure \ref{fig:triade}. Desired beh
 
 Figure \ref{fig:triade} presents three visualisations of the rivalry relations between variables.
 % Triade
-\begin{figure}[!hb]
+\begin{figure}[!h]
 	\centering
 	\begin{subfigure}[b]{0.3\linewidth}
 		\includegraphics[width=\linewidth]{figures/chords/chord_swap_Ensemble1000_RCN5333300_097.png}
@@ -45,8 +45,18 @@ Scripts applied to the Type 2 Diabetes (T2D) deliver results which can be interp
 
 A regular swapping run on an Ensemble containing T2D data takes 984$\times$3$\times$8$\times$298 = 7,037,568 swap attempts (Eq. in \ref{section:methods:complex}), being 984 the number of sequentials, 3 splits of data each, 8 original variables and 298 top variables to swap.
 \\
+% Not-normalised scores show the same pattern, except the node additions is more exponential, i.e. it does not add one node at the time, but several.
+% Testing the Correlation score among feature's values by randomly picking 10.000 samples, shows a bimodal distribution: either the Correlation is close to 0.9 or to 0.1, which might be causing the bias in the swapper. See Suppl. Figure \ref{fig:graph-evo-nn} for graph evolution.
+% \\
+
+Finally, on normalised scores corrected for quasi-constancy, a majority of CC containing 2 and 3 nodes is found. Figure \ref{fig:main-graphs} displays how the graph become less crowded as we increase the Rivalry Score and the QLOI thresholds.
+\\
+
+% re-ranking
+After generating the new relations file, i.e. establishing rivalry relations among variables, and hence grouping them when counting, we proceed to re-rank the list. The maximum value for the new votes assigned to a group is the sum of all the votes coming from the items belonging to this group, although due to the intersection subtraction (if present), it might be lower. Table \ref{tbl:rerank} shows an example of the re-ranking result.
+\\
 % Rival variants graph
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
 % 	\captionsetup{justification=centering}
 	\begin{subfigure}[b]{0.30\linewidth}
@@ -68,15 +78,10 @@ A regular swapping run on an Ensemble containing T2D data takes 984$\times$3$\ti
     \label{fig:main-graphs}
 \end{figure}
 
-Normalised scores show the following pattern: when plotting the graph step by step -- filtering edge weight from the highest to the lowest-- , the variables added tend to have a $\approx$ 0.98 Spearman correlation similarity in the original data. Besides, for each addition, we add a node to the connected component and do not form new ones. If any Connected Component (CC) is created, it is soon linked. See Suppl. Figure \ref{fig:graph-evo-sa} for graph evolution.
+Analysing results extracted on this work configuration (Section \ref{section:cfg}), we observe the correlation among variables tends to be quite low (Suppl. Figure \ref{fig:triade-hist}), evidencing collisions among all-0's and all-1's column values. The Quasi-constant Leave-Out Index trims the node presence in the graph, however, it has no effect on correlation among variables. As a post-process step, we consider only the variables which hold a correlation close to 0.5, based on the fact that identical features containing quasi-constant values will have a correlation close to 1, and opposite features again containing quasi-constant values will have a correlation close to 0.
 \\
-
-% Not-normalised scores show the same pattern, except the node additions is more exponential, i.e. it does not add one node at the time, but several.
-% Testing the Correlation score among feature's values by randomly picking 10.000 samples, shows a bimodal distribution: either the Correlation is close to 0.9 or to 0.1, which might be causing the bias in the swapper. See Suppl. Figure \ref{fig:graph-evo-nn} for graph evolution.
-% \\
-
 % results table
-\begin{table}[!hb]
+\begin{table}[!hpt]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -104,15 +109,6 @@ SNP\_16          & 22                        & 29                      & \cellco
 \caption{Re-ranked table including only features whose rank has changed. \emph{Reference count} column indicates the original votes obtained by the feature, while \emph{Grouped\_count} displays the new votes after grouping. The 8 different formed groups can also be seen in Figure \ref{fig:main-graphs} (c). Table's column \emph{group} colours match found groups. Bold rows mark features promoted to the existing top-ranked set. Parameters used: Swap Score=0.95, QLOI=0.3.}
 \label{tbl:rerank}
 \end{table}
-
-Finally, on normalised scores corrected for quasi-constancy, a majority of CC containing 2 and 3 nodes is found. Figure \ref{fig:main-graphs} displays how the graph become less crowded as we increase the Rivalry Score and the QLOI thresholds.
-
-% re-ranking
-After generating the new relations file, i.e. establishing rivalry relations among variables, and hence grouping them when counting, we proceed to re-rank the list. The maximum value for the new votes assigned to a group is the sum of all the votes coming from the items belonging to this group, although due to the intersection subtraction (if present), it might be lower. Table \ref{tbl:rerank} shows an example of the re-ranking result.
-
-\\
-
-Analysing results extracted on this work configuration (Section \ref{section:cfg}), we observe the correlation among variables tends to be quite low (Suppl. Figure \ref{fig:triade-hist}), evidencing collisions among all-0's and all-1's column values. The Quasi-constant Leave-Out Index trims the node presence in the graph, however, it has no effect on correlation among variables. As a post-process step, we consider only the variables which hold a correlation close to 0.5, based on the fact that identical features containing quasi-constant values will have a correlation close to 1, and opposite features again containing quasi-constant values will have a correlation close to 0.
 \\
 
 Further analysis on Rivalry Scores of 0.975 and 1 can be found in Suppl. Material \ref{section:suppl:extra-hist}.
@@ -121,9 +117,10 @@ Further analysis on Rivalry Scores of 0.975 and 1 can be found in Suppl. Materia
 Our main focus is put on rival variables which hold low similarity among them, but which in the context of a prediction, they become rival.
 
 Based in an set of experiments, Table \ref{tbl:summary-exps} summarises changes occurring in the final list of relevant features after applying different configurations of the swapping algorithm.
+\\
 
 % experiments table
-\begin{table}[!hb]
+\begin{table}[!h]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|c|c|}
