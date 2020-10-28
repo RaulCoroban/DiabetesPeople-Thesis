@@ -1,4 +1,4 @@
-# Ensemble Feature Selector - MSc Bioinformatics Minor Thesis
+# Ensemble Feature Selector
 
 ## Overview
 This project aims to identify redundant variables in order to improve Feature Selection. Relevant variables identification is performed via an Ensemble method based on resampling without replacement. In order to detect redundant variables I perform maximum-relevance minimum-redundancy (MRMR) approaches, plus a novel algorithm which individually swaps each feature set item by an ensemble top-picked variable (rivalry detection).
